@@ -2,7 +2,9 @@ import numpy as np
 from easydict import EasyDict as Dict
 
 
-class Model:
+class Network:
+    def __str__(self):
+        return "<object> RNN neural network for language model"
     def __init__(self, params):
         self.input_size = params.dimensions[0]
         self.hidden_size = params.dimensions[1]
@@ -11,7 +13,7 @@ class Model:
         self.w_reverse = np.random.random((self.hidden_size, self.hidden_size))
         self.w_second = np.random.random((self.input_size, self.hidden_size))
 
-    def forward_propagation(self, x):
+    def forward(self, x):
         # define hidden_state with its shape the shape of hidden_state is input_size + 1 by hidden_size
         state = np.zeros((self.input_size + 1, self.hidden_size))
 
@@ -30,7 +32,7 @@ class Model:
             state[t] = np.tanh(self.w_frist.dot(input) + self.w_reverse.dot(state[t-1]))
             output[t] = self.softmax(self.w_second.dot(state[t]))
 
-        return [state, output]
+        return state, output
 
     def softmax(self, vector):
         exp_vector = np.exp(vector)
@@ -43,14 +45,18 @@ params = Dict({
 })
 
 
-# initializing the Model
-rnn = Model(params)
+# initializing the Network
+network = Network(params)
+print('\n----------------------')
+print("shape of w_first  ", network.w_frist.shape)
+print('shape of w_second  ', network.w_second.shape)
+print('shape of w_reverse ', network.w_reverse.shape)
+print('---------------------------')
 
-# implementing the forward_propagation
-[state, output] = rnn.forward_propagation([2, 0, 1])
+state, output = network.forward([2, 0, 1])
 print('\n-------------------------')
 print('the hidden state of the Model is \n', state)
-print('\nshape of hidden state', state.shape)
+print('\nshape of hidden state ', state.shape)
 print('\n-------------------------')
 print('the output of the Model is \n', output)
 print('\nshape of outuput', output.shape)
